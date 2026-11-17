@@ -3,3 +3,7 @@
 *.sqlite3-journal
 *.sqlite3-wal
 *.sqlite3-shm
+__pycache__/
+*.py[cod]
+*$py.class
+.env
