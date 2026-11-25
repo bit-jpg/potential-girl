@@ -1,0 +1,485 @@
+:root {
+    --panel-bg: #c4cfd9;
+    --ink: #1f2a35;
+    --ink-soft: #3c4a58;
+    --accent: #9e1b1e;
+    --accent-dark: #7c1417;
+    --panel-w: 520px;
+}
+
+body,
+html {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+/* dark canvas as a fallback if the slideshow photos fail to load */
+html {
+    background-color: #0f172a;
+}
+
+/* ---------- Shifting blurred background ---------- */
+.bg-slideshow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.bg-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center 30%;
+    opacity: 0;
+    transition:
+        opacity 1.5s ease-in-out,
+        transform 6s ease-in-out;
+    /* keep the slide slightly zoomed so the weak blur never reveals transparent edges */
+    transform: scale(1.08);
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+}
+
+.bg-slide-1 {
+    background-image: url("../Images/Background/5ce9ad70-0e41-4c10-b5ee-7a83d38f1132.jpeg");
+}
+
+.bg-slide-2 {
+    background-image: url("../Images/Background/68b89f62-8f19-412b-bc5a-8a062d4786f0.jpeg");
+}
+
+.bg-slide-3 {
+    background-image: url("../Images/Background/dcb02898-f5d2-493e-8888-8b8eeee07c66.jpeg");
+}
+
+.bg-slide.active {
+    opacity: 1;
+    transform: scale(1.12);
+}
+
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.35);
+    z-index: 1;
+}
+
+/* ---------- Stage / layout ---------- */
+.login-stage {
+    position: relative;
+    z-index: 2;
+    /* sits above the slideshow (0) and the dim overlay (1) */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* ---------- School logo circle (centered on the panel's edge: exactly half tucked behind the panel, half shown) ---------- */
+.logo-orb {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + var(--panel-w) / 2);
+    transform: translate(-50%, -50%);
+    width: clamp(660px, 100vh, 1180px);
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background-image: url("../Images/Logos/BCT Logo.png");
+    background-size: cover;
+    background-position: center;
+    background-color: #f4f1ec;
+    /* never let the circle tip out on the panel's left side; clip exactly at the panel's left edge */
+    clip-path: inset(0 0 0 max(0px, calc(clamp(660px, 100vh, 1180px) / 2 - var(--panel-w))));
+    box-shadow:
+        inset 0 0 0 6px rgba(255, 255, 255, 0.18),
+        inset 0 0 120px rgba(0, 0, 0, 0.4),
+        0 25px 80px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* ---------- Solid color panel ---------- */
+.login-panel {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: var(--panel-w);
+    min-height: 100vh;
+    background: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem clamp(1.25rem, 4vw, 3rem);
+    box-shadow: 0 0 70px rgba(0, 0, 0, 0.5);
+}
+
+.panel-content {
+    width: 100%;
+    max-width: 470px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* ---------- School name acronym boxes (middle one taller) ---------- */
+.acronym-boxes {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    margin-bottom: 1.4rem;
+}
+
+.letter-box {
+    width: clamp(64px, 9vh, 84px);
+    height: clamp(88px, 13vh, 116px);
+    border: 3px solid var(--ink);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.6rem, 4.5vh, 2.2rem);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.letter-box-tall {
+    width: clamp(74px, 10.5vh, 96px);
+    height: clamp(112px, 17vh, 150px);
+    background: transparent;
+}
+
+.letter-box:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- School full name ---------- */
+.school-full-name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: clamp(0.9rem, 2.3vh, 1.08rem);
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.35;
+}
+
+/* ---------- School motto (curved text) ---------- */
+.motto-arc {
+    width: min(340px, 92%);
+    height: auto;
+    overflow: visible;
+    margin-top: 0.15rem;
+}
+
+.motto-text {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    fill: var(--ink-soft);
+    text-transform: uppercase;
+}
+
+/* ---------- Login form / input bars ---------- */
+.login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    margin-top: 2rem;
+}
+
+.input-bar {
+    width: 100%;
+    height: 3.7rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 2px;
+    padding: 0 1.4rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    outline: none;
+    box-shadow: 0 1px 2px rgba(16, 24, 32, 0.18);
+    transition: box-shadow 0.2s ease;
+}
+
+.input-bar::placeholder {
+    color: #39465a;
+    opacity: 1;
+}
+
+.input-bar:hover {
+    box-shadow: 0 4px 14px rgba(16, 24, 32, 0.22);
+}
+
+.input-bar:focus {
+    box-shadow:
+        0 0 0 3px rgba(158, 27, 30, 0.35),
+        0 4px 14px rgba(16, 24, 32, 0.22);
+}
+
+.password-bar {
+    width: 100%;
+    height: 3.7rem;
+    background: #ffffff;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    padding-right: 0.35rem;
+    box-shadow: 0 1px 2px rgba(16, 24, 32, 0.18);
+    transition: box-shadow 0.2s ease;
+}
+
+.password-bar input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0 0.5rem 0 1.4rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    border-radius: 2px;
+}
+
+.password-bar input::placeholder {
+    color: #39465a;
+    opacity: 1;
+}
+
+.password-bar:hover {
+    box-shadow: 0 4px 14px rgba(16, 24, 32, 0.22);
+}
+
+.password-bar:focus-within {
+    box-shadow:
+        0 0 0 3px rgba(158, 27, 30, 0.35),
+        0 4px 14px rgba(16, 24, 32, 0.22);
+}
+
+.toggle-password {
+    flex: 0 0 auto;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 2px;
+    background: transparent;
+    color: #55626e;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: var(--accent);
+    background: rgba(158, 27, 30, 0.08);
+}
+
+.toggle-password:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+/* ---------- Login button ---------- */
+.btn-login {
+    height: 3.4rem;
+    border: none;
+    border-radius: 2px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    padding-left: 0.3em;
+    /* balance the trailing tracking */
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(124, 20, 23, 0.4);
+    transition:
+        background-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.btn-login:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(124, 20, 23, 0.45);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-login:focus-visible {
+    outline: 3px solid rgba(158, 27, 30, 0.45);
+    outline-offset: 3px;
+}
+
+/* ---------- Reset password (sits directly under the password bar) ---------- */
+.reset-link {
+    align-self: center;
+    margin-top: -0.55rem;
+    /* pull closer to the password bar above */
+    color: var(--ink);
+    font-size: 0.92rem;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.reset-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.reset-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+/* ---------- Small print ---------- */
+.panel-footer {
+    margin: 2.2rem 0 0;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4d5a66;
+}
+
+/* ---------- Seal badge (small screens only) ---------- */
+.seal-badge {
+    display: none;
+    width: 128px;
+    height: 128px;
+    margin: -4.8rem auto 1.5rem;
+    padding: 6px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow:
+        0 0 0 4px rgba(158, 27, 30, 0.85),
+        0 14px 30px rgba(0, 0, 0, 0.35);
+}
+
+.seal-badge img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ---------- Breakpoints ---------- */
+@media (max-width: 1199px) {
+    :root {
+        --panel-w: 480px;
+    }
+
+    .logo-orb {
+        width: clamp(540px, 95vh, 980px);
+        clip-path: inset(0 0 0 max(0px, calc(clamp(540px, 95vh, 980px) / 2 - var(--panel-w))));
+    }
+}
+
+@media (max-width: 991px) {
+    .logo-orb {
+        display: none;
+    }
+
+    .login-panel {
+        max-width: 520px;
+        padding-top: 5rem;
+    }
+
+    .seal-badge {
+        display: block;
+    }
+}
+
+@media (max-width: 575px) {
+    .login-panel {
+        padding: 5rem 1.25rem 2.5rem;
+        justify-content: flex-start;
+    }
+
+    .acronym-boxes {
+        gap: 0.6rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .letter-box {
+        width: 58px;
+        height: 80px;
+        border-width: 2px;
+        font-size: 1.5rem;
+    }
+
+    .letter-box-tall {
+        width: 66px;
+        height: 104px;
+    }
+
+    .school-full-name {
+        font-size: 0.9rem;
+        letter-spacing: 0.07em;
+    }
+
+    .input-bar,
+    .password-bar {
+        height: 3.35rem;
+    }
+
+    .input-bar,
+    .password-bar input {
+        font-size: 0.95rem;
+    }
+
+    .btn-login {
+        height: 3.1rem;
+    }
+
+    .panel-footer {
+        margin-top: 1.6rem;
+        font-size: 0.58rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bg-slide {
+        transition: none;
+        transform: none;
+    }
+
+    .letter-box,
+    .btn-login,
+    .input-bar,
+    .password-bar {
+        transition: none;
+    }
+}
