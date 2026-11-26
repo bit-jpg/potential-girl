@@ -1,51 +1,63 @@
 :root {
     --panel-bg: #c4cfd9;
-    --ink: #1f2a35;
+    --ink: #101820;
     --ink-soft: #3c4a58;
     --accent: #9e1b1e;
     --accent-dark: #7c1417;
-    --panel-w: 520px;
+    --field-dark: #0b0b0b;
+    --panel-radius: 28px;
 }
 
-body,
-html {
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
     height: 100%;
     margin: 0;
+    overflow: hidden;
+}
+
+body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden;
+    background: #0f172a;
+    color: var(--ink);
 }
 
-/* dark canvas as a fallback if the slideshow photos fail to load */
-html {
-    background-color: #0f172a;
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
-/* ---------- Shifting blurred background ---------- */
 .bg-slideshow {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     z-index: 0;
+    overflow: hidden;
 }
 
 .bg-slide {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background-size: cover;
-    background-position: center 30%;
+    background-position: center 35%;
     opacity: 0;
-    transition:
-        opacity 1.5s ease-in-out,
-        transform 6s ease-in-out;
-    /* keep the slide slightly zoomed so the weak blur never reveals transparent edges */
     transform: scale(1.08);
-    filter: blur(5px);
-    -webkit-filter: blur(5px);
+    filter: blur(4px);
+    -webkit-filter: blur(4px);
+    transition:
+        opacity 1.6s ease-in-out,
+        transform 8s ease-in-out;
 }
 
 .bg-slide-1 {
@@ -67,61 +79,47 @@ html {
 
 .bg-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.35);
+    inset: 0;
+    background: rgba(15, 23, 42, 0.32);
     z-index: 1;
 }
 
-/* ---------- Stage / layout ---------- */
 .login-stage {
     position: relative;
     z-index: 2;
-    /* sits above the slideshow (0) and the dim overlay (1) */
-    min-height: 100vh;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding: clamp(10px, 2.2vh, 24px) clamp(12px, 3vw, 44px);
     display: flex;
+    align-items: center;
     justify-content: center;
     overflow: hidden;
 }
 
-/* ---------- School logo circle (centered on the panel's edge: exactly half tucked behind the panel, half shown) ---------- */
-.logo-orb {
-    position: absolute;
-    top: 50%;
-    left: calc(50% + var(--panel-w) / 2);
-    transform: translate(-50%, -50%);
-    width: clamp(660px, 100vh, 1180px);
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    background-image: url("../Images/Logos/BCT Logo.png");
-    background-size: cover;
-    background-position: center;
-    background-color: #f4f1ec;
-    /* never let the circle tip out on the panel's left side; clip exactly at the panel's left edge */
-    clip-path: inset(0 0 0 max(0px, calc(clamp(660px, 100vh, 1180px) / 2 - var(--panel-w))));
-    box-shadow:
-        inset 0 0 0 6px rgba(255, 255, 255, 0.18),
-        inset 0 0 120px rgba(0, 0, 0, 0.4),
-        0 25px 80px rgba(0, 0, 0, 0.5);
-    z-index: 1;
-}
-
-/* ---------- Solid color panel ---------- */
 .login-panel {
     position: relative;
     z-index: 2;
     width: 100%;
-    max-width: var(--panel-w);
-    min-height: 100vh;
+    height: 100%;
     background: var(--panel-bg);
+    border-radius: var(--panel-radius);
+    box-shadow: 0 18px 70px rgba(0, 0, 0, 0.45);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem clamp(1.25rem, 4vw, 3rem);
-    box-shadow: 0 0 70px rgba(0, 0, 0, 0.5);
+    padding: clamp(18px, 3.2vh, 40px) clamp(20px, 4vw, 52px);
+    overflow: hidden;
+    transition: max-width 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+body.page-login .login-panel {
+    max-width: clamp(350px, 41vw, 550px);
+}
+
+body.page-register .login-panel {
+    max-width: min(1040px, 86vw);
 }
 
 .panel-content {
@@ -130,63 +128,98 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    transition:
+        opacity 0.28s ease,
+        transform 0.28s ease;
 }
 
-/* ---------- School name acronym boxes (middle one taller) ---------- */
+
+.panel-content.is-leaving {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+    pointer-events: none;
+}
+
+.panel-content.is-entering {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    pointer-events: none;
+}
+
+.seal-badge {
+    display: block;
+    width: clamp(76px, 12vh, 130px);
+    height: clamp(76px, 12vh, 130px);
+    margin-bottom: clamp(12px, 2.4vh, 28px);
+    padding: 5px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+        0 0 0 4px rgba(158, 27, 30, 0.85),
+        0 12px 26px rgba(0, 0, 0, 0.3);
+}
+
+.seal-badge img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .acronym-boxes {
     display: flex;
     align-items: center;
-    gap: clamp(0.75rem, 2vw, 1.25rem);
-    margin-bottom: 1.4rem;
+    justify-content: center;
+    width: 100%;
+    gap: clamp(8px, 2.5%, 20px);
+    margin-bottom: clamp(10px, 2vh, 22px);
 }
 
 .letter-box {
-    width: clamp(64px, 9vh, 84px);
-    height: clamp(88px, 13vh, 116px);
+    width: 27%;
+    height: clamp(100px, 18vh, 180px);
     border: 3px solid var(--ink);
-    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.6rem, 4.5vh, 2.2rem);
+    font-size: clamp(1.5rem, 4vh, 2.4rem);
     font-weight: 800;
-    color: var(--ink);
     letter-spacing: 0.02em;
+    color: var(--ink);
+    background: transparent;
     transition:
         transform 0.2s ease,
         background-color 0.2s ease;
 }
 
 .letter-box-tall {
-    width: clamp(74px, 10.5vh, 96px);
-    height: clamp(112px, 17vh, 150px);
-    background: transparent;
+    width: 31%;
+    height: clamp(125px, 21vh, 210px);
 }
 
 .letter-box:hover {
-    transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.55);
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.5);
 }
 
-/* ---------- School full name ---------- */
 .school-full-name {
+    margin: 0;
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    font-size: clamp(0.9rem, 2.3vh, 1.08rem);
-    color: var(--ink);
-    margin: 0;
+    font-size: clamp(0.82rem, 1.9vh, 1.05rem);
     line-height: 1.35;
+    text-align: center;
+    color: var(--ink);
 }
 
-/* ---------- School motto (curved text) ---------- */
 .motto-arc {
     width: min(340px, 92%);
     height: auto;
+    margin-top: 0.1rem;
     overflow: visible;
-    margin-top: 0.15rem;
 }
 
 .motto-text {
@@ -197,90 +230,79 @@ html {
     text-transform: uppercase;
 }
 
-/* ---------- Login form / input bars ---------- */
-.login-form {
+.auth-form {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.15rem;
-    margin-top: 2rem;
+    gap: clamp(12px, 3vh, 28px);
+    margin-top: clamp(18px, 3.4vh, 42px);
+}
+
+.field {
+    width: 100%;
+}
+
+.input-bar,
+.password-bar {
+    width: 100%;
+    height: clamp(42px, 6.4vh, 62px);
+    background: #fff;
+    border: none;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(16, 24, 32, 0.2);
+    transition: box-shadow 0.2s ease;
 }
 
 .input-bar {
-    width: 100%;
-    height: 3.7rem;
-    background: #ffffff;
-    border: none;
-    border-radius: 2px;
-    padding: 0 1.4rem;
-    font-size: 1.05rem;
+    padding: 0 clamp(14px, 2vw, 24px);
+    font-size: clamp(0.95rem, 1.9vh, 1.1rem);
     letter-spacing: 0.02em;
     color: var(--ink);
     outline: none;
-    box-shadow: 0 1px 2px rgba(16, 24, 32, 0.18);
-    transition: box-shadow 0.2s ease;
 }
 
-.input-bar::placeholder {
-    color: #39465a;
-    opacity: 1;
-}
-
-.input-bar:hover {
-    box-shadow: 0 4px 14px rgba(16, 24, 32, 0.22);
-}
-
-.input-bar:focus {
-    box-shadow:
-        0 0 0 3px rgba(158, 27, 30, 0.35),
-        0 4px 14px rgba(16, 24, 32, 0.22);
-}
-
-.password-bar {
-    width: 100%;
-    height: 3.7rem;
-    background: #ffffff;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    padding-right: 0.35rem;
-    box-shadow: 0 1px 2px rgba(16, 24, 32, 0.18);
-    transition: box-shadow 0.2s ease;
-}
-
-.password-bar input {
-    flex: 1 1 auto;
-    min-width: 0;
-    height: 100%;
-    border: none;
-    background: transparent;
-    outline: none;
-    padding: 0 0.5rem 0 1.4rem;
-    font-size: 1.05rem;
-    letter-spacing: 0.02em;
-    color: var(--ink);
-    border-radius: 2px;
-}
-
+.input-bar::placeholder,
 .password-bar input::placeholder {
     color: #39465a;
     opacity: 1;
 }
 
+.input-bar:hover,
 .password-bar:hover {
     box-shadow: 0 4px 14px rgba(16, 24, 32, 0.22);
 }
 
+.input-bar:focus,
 .password-bar:focus-within {
     box-shadow:
         0 0 0 3px rgba(158, 27, 30, 0.35),
         0 4px 14px rgba(16, 24, 32, 0.22);
 }
 
+.password-bar {
+    display: flex;
+    align-items: center;
+    padding-right: 0.35rem;
+}
+
+.password-bar input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0.5rem 0 clamp(14px, 2vw, 24px);
+    border: none;
+    border-radius: 2px;
+    background: transparent;
+    outline: none;
+    font-size: clamp(0.95rem, 1.9vh, 1.1rem);
+    letter-spacing: 0.02em;
+    color: var(--ink);
+}
+
 .toggle-password {
     flex: 0 0 auto;
-    width: 3rem;
-    height: 3rem;
+    width: 2.8rem;
+    height: 2.8rem;
     border: none;
     border-radius: 2px;
     background: transparent;
@@ -302,21 +324,58 @@ html {
     outline-offset: -2px;
 }
 
-/* ---------- Login button ---------- */
+.form-links {
+    display: flex;
+    gap: clamp(12px, 2vw, 26px);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: -0.3rem;
+}
+
+.form-links a {
+    font-size: clamp(0.82rem, 1.7vh, 0.92rem);
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.reset-link {
+    color: var(--ink);
+}
+
+.register-link {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.form-links a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.form-links a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
 .btn-login {
-    height: 3.4rem;
+    width: 100%;
+    height: clamp(42px, 6.2vh, 60px);
     border: none;
     border-radius: 2px;
     background: var(--accent);
-    color: #ffffff;
-    font-size: 0.95rem;
+    color: #fff;
+    font-size: clamp(0.85rem, 1.7vh, 1rem);
     font-weight: 700;
     letter-spacing: 0.3em;
     padding-left: 0.3em;
-    /* balance the trailing tracking */
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 12px 24px rgba(124, 20, 23, 0.4);
+    box-shadow: 0 10px 22px rgba(124, 20, 23, 0.4);
     transition:
         background-color 0.2s ease,
         transform 0.15s ease,
@@ -326,7 +385,6 @@ html {
 .btn-login:hover {
     background: var(--accent-dark);
     transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(124, 20, 23, 0.45);
 }
 
 .btn-login:active {
@@ -338,148 +396,309 @@ html {
     outline-offset: 3px;
 }
 
-/* ---------- Reset password (sits directly under the password bar) ---------- */
-.reset-link {
-    align-self: center;
-    margin-top: -0.55rem;
-    /* pull closer to the password bar above */
-    color: var(--ink);
-    font-size: 0.92rem;
-    letter-spacing: 0.03em;
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    padding-bottom: 2px;
+.panel-footer {
+    margin: clamp(14px, 2.6vh, 30px) 0 0;
+    font-size: clamp(0.58rem, 1.1vh, 0.68rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #4d5a66;
+    text-align: center;
+}
+
+body.page-register .login-panel {
+    padding: clamp(18px, 3vh, 38px) clamp(20px, 4vw, 64px);
+}
+
+body.page-register .panel-content {
+    max-width: 100%;
+}
+
+.register-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 2.5vw, 34px);
+    margin-bottom: clamp(16px, 3.2vh, 40px);
+}
+
+.register-seal {
+    flex: 0 0 auto;
+    width: clamp(58px, 10vh, 116px);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+
+.register-heading h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 5.2vh, 3.4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #0b0b0b;
+}
+
+.register-heading p {
+    margin: clamp(4px, 0.9vh, 12px) 0 0;
+    font-size: clamp(0.8rem, 1.9vh, 1.15rem);
+    color: #1a1a1a;
+}
+
+.register-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.register-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(16px, 4vw, 70px);
+    row-gap: clamp(14px, 4vh, 38px);
+}
+
+.register-field {
+    min-width: 0;
+}
+
+.dark-input,
+.dark-password {
+    width: 100%;
+    height: clamp(42px, 7.6vh, 76px);
+    background: var(--field-dark);
+    border: 1px solid #000;
+    border-radius: 0;
+}
+
+.dark-input {
+    padding: 0 clamp(12px, 1.6vw, 24px);
+    color: #fff;
+    font-size: clamp(0.9rem, 1.9vh, 1.1rem);
+    outline: none;
+}
+
+.dark-input::placeholder,
+.dark-password input::placeholder {
+    color: rgba(255, 255, 255, 0.9);
+    opacity: 1;
+}
+
+.dark-input:focus,
+.dark-password:focus-within {
+    box-shadow: 0 0 0 3px rgba(158, 27, 30, 0.55);
+}
+
+.dark-password {
+    display: flex;
+    align-items: center;
+    padding-right: 0.3rem;
+}
+
+.dark-password input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0.6rem 0 clamp(12px, 1.6vw, 24px);
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: clamp(0.9rem, 1.9vh, 1.1rem);
+    outline: none;
+}
+
+.dark-password .toggle-password {
+    color: #e6e6e6;
+}
+
+.dark-password .toggle-password:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.name-with-suffix {
+    display: flex;
+    width: 100%;
+}
+
+.name-with-suffix .dark-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.suffix-input {
+    flex: 0 0 clamp(76px, 9vw, 132px);
+    height: clamp(42px, 7.6vh, 76px);
+    padding: 0 10px;
+    border: 1px solid #000;
+    border-left: none;
+    border-radius: 0;
+    background: #6d6d6d;
+    color: #fff;
+    font-size: clamp(0.82rem, 1.7vh, 1rem);
+    outline: none;
+    cursor: pointer;
+}
+
+.suffix-input:focus {
+    box-shadow: 0 0 0 3px rgba(158, 27, 30, 0.55);
+}
+
+.register-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(10px, 1.8vh, 20px);
+    margin-top: clamp(16px, 3.2vh, 40px);
+}
+
+.btn-signup {
+    width: clamp(260px, 52%, 560px);
+    height: clamp(42px, 6.5vh, 66px);
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #0c0c0c;
+    color: #fff;
+    font-size: clamp(0.95rem, 2vh, 1.2rem);
+    cursor: pointer;
     transition:
-        color 0.2s ease,
-        border-color 0.2s ease;
+        background-color 0.2s ease,
+        transform 0.15s ease;
 }
 
-.reset-link:hover {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+.btn-signup:hover {
+    background: #232323;
+    transform: translateY(-1px);
 }
 
-.reset-link:focus-visible {
-    outline: 2px solid var(--accent);
+.btn-signup:active {
+    transform: translateY(0);
+}
+
+.btn-signup:focus-visible {
+    outline: 3px solid rgba(158, 27, 30, 0.55);
     outline-offset: 3px;
 }
 
-/* ---------- Small print ---------- */
-.panel-footer {
-    margin: 2.2rem 0 0;
-    font-size: 0.66rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #4d5a66;
+.existing-account {
+    margin: 0;
+    font-size: clamp(0.85rem, 1.9vh, 1.1rem);
+    color: #111;
+    text-align: center;
 }
 
-/* ---------- Seal badge (small screens only) ---------- */
-.seal-badge {
-    display: none;
-    width: 128px;
-    height: 128px;
-    margin: -4.8rem auto 1.5rem;
-    padding: 6px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow:
-        0 0 0 4px rgba(158, 27, 30, 0.85),
-        0 14px 30px rgba(0, 0, 0, 0.35);
+.existing-account a {
+    color: #111;
+    font-weight: 600;
+    text-decoration: none;
 }
 
-.seal-badge img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
+.existing-account a:hover {
+    text-decoration: underline;
+}
+
+.result-box {
+    max-width: 470px;
+    margin: clamp(14px, 2.6vh, 30px) auto 0;
+    padding: clamp(14px, 2.4vh, 26px);
+    border-radius: 10px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.result-box.success {
+    background: #e7f4ea;
+    color: #1e6b3a;
+    border: 1px solid #b7dfc8;
+}
+
+.result-box.error {
+    background: #fbeaea;
+    color: #8a2424;
+    border: 1px solid #f2c4c4;
+}
+
+.result-box a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 700;
+}
+
+.result-box .icon {
     display: block;
+    font-size: clamp(1.6rem, 4vh, 2.5rem);
+    margin-bottom: 0.6rem;
 }
 
-/* ---------- Breakpoints ---------- */
-@media (max-width: 1199px) {
-    :root {
-        --panel-w: 480px;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
 
-    .logo-orb {
-        width: clamp(540px, 95vh, 980px);
-        clip-path: inset(0 0 0 max(0px, calc(clamp(540px, 95vh, 980px) / 2 - var(--panel-w))));
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-@media (max-width: 991px) {
-    .logo-orb {
-        display: none;
+@media (max-width: 980px),
+(max-height: 620px) {
+
+    html,
+    body {
+        overflow: auto;
+    }
+
+    .login-stage {
+        height: auto;
+        min-height: 100dvh;
+        padding: 22px 14px;
     }
 
     .login-panel {
-        max-width: 520px;
-        padding-top: 5rem;
-    }
-
-    .seal-badge {
-        display: block;
-    }
-}
-
-@media (max-width: 575px) {
-    .login-panel {
-        padding: 5rem 1.25rem 2.5rem;
+        height: auto;
+        min-height: calc(100dvh - 44px);
+        padding-top: 32px;
+        padding-bottom: 32px;
         justify-content: flex-start;
     }
 
-    .acronym-boxes {
-        gap: 0.6rem;
-        margin-bottom: 1.1rem;
+    .register-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .register-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 520px) {
+    .register-heading h1 {
+        font-size: 1.6rem;
     }
 
     .letter-box {
-        width: 58px;
-        height: 80px;
         border-width: 2px;
-        font-size: 1.5rem;
-    }
-
-    .letter-box-tall {
-        width: 66px;
-        height: 104px;
-    }
-
-    .school-full-name {
-        font-size: 0.9rem;
-        letter-spacing: 0.07em;
-    }
-
-    .input-bar,
-    .password-bar {
-        height: 3.35rem;
-    }
-
-    .input-bar,
-    .password-bar input {
-        font-size: 0.95rem;
-    }
-
-    .btn-login {
-        height: 3.1rem;
-    }
-
-    .panel-footer {
-        margin-top: 1.6rem;
-        font-size: 0.58rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .bg-slide {
-        transition: none;
-        transform: none;
-    }
 
+    .bg-slide,
     .letter-box,
     .btn-login,
+    .btn-signup,
     .input-bar,
-    .password-bar {
+    .password-bar,
+    .result-box,
+    .panel-content,
+    .login-panel {
         transition: none;
+        animation: none;
     }
 }
