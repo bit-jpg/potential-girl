@@ -1,3 +1,5 @@
+// oh my god gleason, use comments!
+
 document.addEventListener("DOMContentLoaded", function () {
     const prefersReducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",

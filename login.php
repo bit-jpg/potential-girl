@@ -1,15 +1,31 @@
 <?php
 declare(strict_types=1);
-
+// Moving Forward, please comment shit.
+// Thanks, Jayden
 $message = '';
 $messageType = '';
+
+// Map common errors here.
+$errorMesssages = [
+    'login' => [
+        'passwordWrong' => 'Wrong Password!',
+        'studentIdNotFound' => 'Student ID does not exist.',
+    ],
+    'required' => [
+        'password_empty' => 'Password Empty!',
+        'student_id_empty' => 'Please Enter your Student ID.',
+        'both_empty' => 'Both Student ID and Password are Required!',
+    ],
+    'invalid' => 'Invalid Student ID/Username or Password.'
+
+];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $studentId = trim($_POST['studentId'] ?? '');
     $password = trim($_POST['studentPassword'] ?? '');
 
     if (!$studentId || !$password) {
-        $message = 'Please enter both your Student ID and Password.';
+        $message = $errorMesssages['required']['both_empty'];
         $messageType = 'error';
     } else {
         $dataFile = __DIR__ . '/data/registrations.json';
@@ -33,13 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Welcome back, ' . htmlspecialchars($user['first_name'] ?? 'Student') . '! Login successful.';
             $messageType = 'success';
         } else {
-            $message = 'Invalid Student ID/Username or Password.';
+            $message = $errorMesssages['invalid'];
             $messageType = 'error';
         }
     }
 }
 ?>
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
